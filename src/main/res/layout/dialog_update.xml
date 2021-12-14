@@ -6,19 +6,17 @@
     android:orientation="vertical"
     android:layout_margin="8dp">
     <EditText
-        android:id="@+id/dialog_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/dialog_edt"
         android:hint="텍스트 입력"
         android:padding="12dp"
-        android:lines="4"
-        android:gravity="top"/>
-
-    <Button
-        android:id="@+id/bt_update"
+        android:lines="1"
+        android:gravity="top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="EDIT"
-        android:layout_marginTop="8dp"/>
-
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/dialog_update"
+        android:text="수정"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

@@ -13,5 +13,4 @@ public class Memo implements Serializable {
 
     @ColumnInfo(name="nicName")
     public String nicName;
-    
 }

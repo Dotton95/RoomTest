@@ -11,16 +11,19 @@ import java.util.List;
 
 @Dao
 public interface MemoDao {
+    //Create
     @Insert(onConflict = REPLACE)
     void insert(Memo memo);
 
-    @Delete
-    void delete(Memo memo);
-
-    @Query("UPDATE memo SET nicName = :nicName WHERE 'no' = :no")
-    void update(int no, String nicName);
-
-
+    //READ (SELECT)
     @Query("SELECT * FROM memo")
     List<Memo> getAll();
+
+    //UPDATE
+    @Query("UPDATE memo SET nicName = :nicName WHERE `no` = :no")
+    void update(int no, String nicName);
+
+    //DELETE
+    @Delete
+    void delete(Memo memo);
 }

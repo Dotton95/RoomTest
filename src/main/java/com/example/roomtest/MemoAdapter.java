@@ -6,10 +6,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,7 +24,7 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.ViewHolder> {
 
     private List<Memo> memoList;
     private Activity context;
-    private MemoDB database;
+    private MemoDB memoDB;
 
     public MemoAdapter(Activity context,List<Memo> list){
         this.context = context;
@@ -30,6 +32,24 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
+    @Override
+    public int getItemCount() {
+        return memoList.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder{
+
+        TextView memo_tv_no,memo_tv_nicname;
+        ImageView memo_iv_edit,memo_iv_delete;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            memo_tv_no = itemView.findViewById(R.id.memo_tv_no);
+            memo_tv_nicname = itemView.findViewById(R.id.memo_tv_nicname);
+            memo_iv_edit = itemView.findViewById(R.id.memo_iv_edit);
+            memo_iv_delete = itemView.findViewById(R.id.memo_iv_delete);
+        }
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,57 +60,46 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Memo memo = memoList.get(position);
-        database = MemoDB.getInstance(context);
-        holder.tv_memo_no.setText(memo.no+"번 유저");
-        holder.tv_memo_nicname.setText(memo.nicName);
-        holder.btEdit.setOnClickListener(v->{
+        memoDB = MemoDB.getInstance(context);
+
+        holder.memo_tv_no.setText(memo.no+"번");
+        holder.memo_tv_nicname.setText(memo.nicName);
+
+        holder.memo_iv_edit.setOnClickListener(v->{
+
             Memo editMemo = memoList.get(holder.getAdapterPosition());
             int no = editMemo.no;
             String text = editMemo.nicName;
 
             Dialog dialog = new Dialog(context);
+            dialog.setContentView(R.layout.dialog_update);
+            int w = WindowManager.LayoutParams.MATCH_PARENT;
+            int h = WindowManager.LayoutParams.WRAP_CONTENT;
+
+            dialog.getWindow().setLayout(w,h);
             dialog.show();
 
-            EditText editText = dialog.findViewById(R.id.dialog_edit_text);
-            Button bt_update = dialog.findViewById(R.id.bt_update);
+            EditText dialog_edt = dialog.findViewById(R.id.dialog_edt);
+            Button dialog_update = dialog.findViewById(R.id.dialog_update);
 
-            editText.setText(text);
-            bt_update.setOnClickListener(v1 -> {
+            dialog_edt.setText(text);
+            dialog_update.setOnClickListener(v1 -> {
                 dialog.dismiss();
-                String updateText = editText.getText().toString();
-                database.memoDao().update(no,updateText);
+                String updateText = dialog_edt.getText().toString();
+                memoDB.memoDao().update(no,updateText);
                 memoList.clear();
-                memoList.addAll(database.memoDao().getAll());
+                memoList.addAll(memoDB.memoDao().getAll());
                 notifyDataSetChanged();
             });
         });
-        holder.btDelete.setOnClickListener(v -> {
+        holder.memo_iv_delete.setOnClickListener(v -> {
             Memo memo1 = memoList.get(holder.getAdapterPosition());
-            database.memoDao().delete(memo1);
+            memoDB.memoDao().delete(memo1);
 
             int pos = holder.getAdapterPosition();
             memoList.remove(pos);
             notifyItemRemoved(pos);
             notifyItemRangeChanged(pos,memoList.size());
-
         });
     }
-
-    @Override
-    public int getItemCount() {
-        return memoList.size();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView tv_memo_no,tv_memo_nicname;
-        ImageView btEdit,btDelete;
-        public ViewHolder(View itemView) {
-            super(itemView);
-            tv_memo_no = itemView.findViewById(R.id.tv_no);
-            tv_memo_nicname = itemView.findViewById(R.id.tv_nicname);
-            btEdit = itemView.findViewById(R.id.bt_edit);
-            btDelete = itemView.findViewById(R.id.bt_delete);
-        }
-    }
-
 }
